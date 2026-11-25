@@ -234,15 +234,21 @@ export type ModelIdsResult =
  * problem so the caller can surface an actionable error rather than persisting a
  * dead provider. Never throws.
  */
-export async function fetchOpenAICompatibleModelIds(baseUrl: string, apiKey: string): Promise<ModelIdsResult> {
+export async function fetchOpenAICompatibleModelIds(
+	baseUrl: string,
+	apiKey: string,
+	opts: { type?: string } = {},
+): Promise<ModelIdsResult> {
 	const url = `${baseUrl.replace(/\/+$/, "")}/models`;
 	// Refuse BEFORE the key is attached, and hand the caller the reason so the
 	// operator sees "http:// to a remote host" rather than "key rejected".
 	const transport = checkCredentialTransport(url);
 	if (!transport.ok) return { ok: false, reason: "insecure_transport", detail: transport.reason };
-	const body = (await fetchJson(url, apiKey)) as { data?: Array<{ id?: unknown }> } | null;
+	const body = (await fetchJson(url, apiKey)) as { data?: Array<{ id?: unknown; type?: unknown }> } | null;
 	if (!body || !Array.isArray(body.data)) return { ok: false, reason: "unavailable" };
 	const ids = body.data
+		// Mixed-modality gateways tag each entry with a `type`; keep the chat ones.
+		.filter((m) => !opts.type || m?.type === opts.type)
 		.map((m) => (typeof m?.id === "string" ? m.id.trim() : ""))
 		// Substring (not word-bounded) — NVIDIA fuses the type into the id, e.g.
 		// `nv-embedqa-e5-v5`, `llama-3.2-nv-rerankqa-1b-v2`, where a `\b` after

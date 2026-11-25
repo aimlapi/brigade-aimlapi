@@ -1848,7 +1848,9 @@ async function ensureCustomProvider(
 		if (provider.liveModels && provider.baseUrl) {
 			tui.addChild(new Text(brand.dim(`  Fetching ${provider.name} models…`), 0, 0));
 			tui.requestRender();
-			const listed = await fetchOpenAICompatibleModelIds(provider.baseUrl, key);
+			const listed = await fetchOpenAICompatibleModelIds(provider.baseUrl, key, {
+				type: provider.liveModelsType,
+			});
 			if (!listed.ok) {
 				// `unavailable` means either a rejected key OR an unreachable endpoint
 				// (firewall/proxy/offline) — don't accuse the key outright. A transport
@@ -1939,6 +1941,14 @@ async function pickModel(tui: TUI, modelRegistry: ModelRegistry, providerId: str
 		return (mb.contextWindow ?? 0) - (ma.contextWindow ?? 0);
 	});
 
+	// A live catalog with hundreds of bare ids has nothing to sort by, so a
+	// catalog entry can name a sensible starter model to lead the list.
+	const recommendedIdx = indexOfRecommendedModel(items, findProvider(providerId)?.recommendedModel);
+	const rec = recommendedIdx >= 0 ? items.splice(recommendedIdx, 1)[0] : undefined;
+	if (rec) {
+		items.unshift({ ...rec, description: rec.description ? `recommended · ${rec.description}` : "recommended" });
+	}
+
 	// GitHub Copilot: offer Auto first. On a plan that can't choose its own model
 	// it's the only choice that reliably works, so it leads and says why; on a
 	// paid seat it's a convenience. The rule below it is decorative — SelectItem
@@ -1990,6 +2000,12 @@ async function pickModel(tui: TUI, modelRegistry: ModelRegistry, providerId: str
 	} catch {
 		return "back";
 	}
+}
+
+/** Position of the provider's recommended starter model in the picker rows, or -1. */
+export function indexOfRecommendedModel(items: ReadonlyArray<SelectItem>, recommended: string | undefined): number {
+	if (!recommended) return -1;
+	return items.findIndex((i) => i.value === recommended);
 }
 
 /** Sentinel value for the decorative divider row in a model picker. */

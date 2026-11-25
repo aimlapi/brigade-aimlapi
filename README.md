@@ -122,7 +122,7 @@ backend — all under one `~/.brigade/` directory you fully own.
 | 🖥️ **Terminal-first** | A flicker-free chat TUI by default. No browser, no Electron. |
 | 🧠 **Memory that lasts** | Facts persist across sessions with origin scoping, decay, and hybrid (keyword + vector) recall — the **Tideline** engine. |
 | 👥 **A real crew** | Spawn isolated agents with their own personas, credentials, and memory; wire them into an **org chart** that governs who can talk to whom. |
-| 🔌 **Bring any model** | Anthropic, OpenAI, Gemini, OpenRouter, OrcaRouter, Token Market, Groq, Cerebras, xAI, DeepSeek, Mistral, local Ollama, or any OpenAI-compatible endpoint. Switch mid-conversation. |
+| 🔌 **Bring any model** | Anthropic, OpenAI, Gemini, OpenRouter, OrcaRouter, Token Market, AI/ML API, Groq, Cerebras, xAI, DeepSeek, Mistral, local Ollama, or any OpenAI-compatible endpoint. Switch mid-conversation. |
 | 📅 **Always-on** | Run as a headless WebSocket gateway with a crash supervisor, cron jobs, and OS service install. |
 | 💬 **Channels** | Talk to your crew from WhatsApp, Telegram, Slack, Discord, iMessage, and BlueBubbles today; the adapter contract is built for more. |
 | 🔗 **1,000+ connectors** | Gmail, Slack, GitHub, Notion, Calendar, Linear… via the built-in Composio tool. |
@@ -791,7 +791,7 @@ switch to `"tree"` to let a parent see sub-agents it spawned.
 
 ## Providers & web search
 
-**Models out of the box:** Anthropic, OpenAI, Google Gemini, OpenRouter, OrcaRouter, Token Market,
+**Models out of the box:** Anthropic, OpenAI, Google Gemini, OpenRouter, OrcaRouter, Token Market, AI/ML API,
 Groq, Cerebras, xAI, DeepSeek, Mistral, **Ollama** (local), and **Custom**
 OpenAI-compatible endpoints (Together, Fireworks, vLLM, LM Studio, on-prem gateways
 — anything that speaks `/v1/chat/completions`). Connect several at once, switch with
@@ -816,7 +816,7 @@ your approval prompts — on a subscription, at no marginal token cost. See
 [Subscription backends](#-subscription-backends--your-claude-login-brigades-tools).
 
 **Web search** is pluggable and auto-selected by what you've configured: Tavily,
-Brave, Exa, Perplexity, Firecrawl, SearXNG (keyed) and DuckDuckGo, Wikipedia, Hacker
+Brave, Exa, Perplexity, Firecrawl, AI/ML API, SearXNG (keyed) and DuckDuckGo, Wikipedia, Hacker
 News, arXiv, GitHub, npm, local Ollama (keyless).
 
 ---

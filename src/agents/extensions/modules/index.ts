@@ -13,6 +13,7 @@ import { imessageModule } from "../../channels/imessage/module.js";
 import { slackModule } from "../../channels/slack/module.js";
 import { telegramModule } from "../../channels/telegram/module.js";
 import { whatsAppModule } from "../../channels/whatsapp/module.js";
+import { aimlapiModule } from "./aimlapi.js";
 import { arxivModule } from "./arxiv.js";
 import { braveModule } from "./brave.js";
 import { duckduckgoModule } from "./duckduckgo.js";
@@ -59,10 +60,12 @@ export const BUNDLED_MODULES: BrigadeModule[] = [
 	//   autoDetectOrder priority — lower number = picked sooner:
 	//     10  Firecrawl fetch (key-gated, JS-heavy fallback)
 	//     20  Tavily search (AI-answer, one-shot RAG)
+	//     20  AI/ML API fetch (key-gated, after Firecrawl fetch)
 	//     30  Brave search (structured native API)
 	//     40  Exa search (neural / content extraction)
 	//     45  Perplexity search (research-mode)
 	//     50  Firecrawl search (same key as fetch)
+	//     60  AI/ML API search (same key as the AI/ML API model provider)
 	//     90  Ollama local web search (free when daemon running)
 	//     100 DuckDuckGo (keyless HTML scrape + Instant Answer fast-path)
 	//     150 Wikipedia (keyless, specialised: definitions / overviews)
@@ -76,6 +79,7 @@ export const BUNDLED_MODULES: BrigadeModule[] = [
 	// npm) sort below DuckDuckGo so a vanilla query still goes to a
 	// general-purpose engine. The model addresses them by name via the
 	// per-call `provider: "<id>"` override on `web_search`.
+	aimlapiModule,
 	arxivModule,
 	braveModule,
 	duckduckgoModule,

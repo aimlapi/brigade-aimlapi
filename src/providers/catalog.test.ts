@@ -19,6 +19,8 @@ const ENV_KEYS_TO_GUARD = [
 	"ORCAROUTER_API_KEY",
 	"ORCA_API_KEY",
 	"TOKENSMARKET_API_KEY",
+	"AIMLAPI_API_KEY",
+	"AIML_API_KEY",
 	"GROQ_API_KEY",
 	"CEREBRAS_API_KEY",
 	"XAI_API_KEY",
@@ -52,6 +54,7 @@ describe("catalog — env-key detection works for every cloud provider", () => {
 		{ id: "openrouter", envVar: "OPENROUTER_API_KEY" },
 		{ id: "orcarouter", envVar: "ORCAROUTER_API_KEY" },
 		{ id: "tokensmarket", envVar: "TOKENSMARKET_API_KEY" },
+		{ id: "aimlapi", envVar: "AIMLAPI_API_KEY" },
 		{ id: "groq", envVar: "GROQ_API_KEY" },
 		{ id: "cerebras", envVar: "CEREBRAS_API_KEY" },
 		{ id: "xai", envVar: "XAI_API_KEY" },
@@ -131,6 +134,7 @@ describe("catalog — env-key detection works for every cloud provider", () => {
 	it("Catalog covers every provider id we expect (regression guard)", () => {
 		const ids = PROVIDERS.map((p) => p.id).sort();
 		assert.deepEqual(ids, [
+			"aimlapi",
 			"anthropic",
 			"cerebras",
 			"claude-cli",
@@ -155,5 +159,32 @@ describe("catalog — env-key detection works for every cloud provider", () => {
 			"tokensmarket",
 			"xai",
 		]);
+	});
+});
+
+describe("catalog — AI/ML API gateway entry", () => {
+	it("is an OpenAI-compatible custom provider on the exact api.aimlapi.com host", () => {
+		const p = findProvider("aimlapi")!;
+		assert.ok(p, "aimlapi missing from catalog");
+		assert.equal(p.name, "AI/ML API");
+		assert.equal(p.custom, true);
+		assert.equal(p.api, "openai-completions");
+		assert.equal(p.baseUrl, "https://api.aimlapi.com/v1");
+		assert.equal(new URL(p.baseUrl!).hostname, "api.aimlapi.com");
+		assert.equal(p.keyUrl, "https://aimlapi.com/app/keys");
+		assert.equal(p.billing, "metered");
+	});
+
+	it("lists models live, keeping only chat-completions entries, with a starter model", () => {
+		const p = findProvider("aimlapi")!;
+		assert.equal(p.liveModels, true);
+		assert.equal(p.liveModelsType, "openai/chat-completions");
+		assert.equal(p.recommendedModel, "openai/gpt-5-mini");
+	});
+
+	it("also reads the AIML_API_KEY spelling", () => {
+		const p = findProvider("aimlapi")!;
+		process.env.AIML_API_KEY = "test-aiml-fallback";
+		assert.deepEqual(resolveProviderEnvVarSource(p), { name: "AIML_API_KEY", value: "test-aiml-fallback" });
 	});
 });

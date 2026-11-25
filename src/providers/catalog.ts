@@ -109,6 +109,20 @@ export interface ProviderInfo {
 	 * catalog — e.g. NVIDIA NIM. The fetch also online-validates the key.
 	 */
 	liveModels?: boolean;
+	/**
+	 * Keep only `/models` entries whose `type` equals this value. For gateways
+	 * whose live list mixes chat models with image / video / audio / embedding
+	 * models and tags each entry with a `type` (AI/ML API uses
+	 * `openai/chat-completions` for chat models). Unset = no type filter.
+	 */
+	liveModelsType?: string;
+	/**
+	 * Model listed first (and marked recommended) in the onboarding model picker
+	 * when the provider serves it. For live catalogs with hundreds of ids and no
+	 * metadata to sort by, so a newcomer lands on a cheap model that handles
+	 * tools, vision and streaming instead of whatever the API lists first.
+	 */
+	recommendedModel?: string;
 }
 
 export const PROVIDERS: ProviderInfo[] = [
@@ -211,6 +225,25 @@ export const PROVIDERS: ProviderInfo[] = [
 		liveModels: true, // models fetched live from /v1/models at onboarding
 		api: "openai-completions",
 		baseUrl: "https://api.tokensmarket.ai/v1",
+		billing: "metered",
+	},
+	{
+		id: "aimlapi",
+		name: "AI/ML API",
+		description: "300+ chat models (GPT, Claude, Gemini, DeepSeek, Qwen…) from one key",
+		keyUrl: "https://aimlapi.com/app/keys",
+		envVar: "AIMLAPI_API_KEY",
+		envVarFallbacks: ["AIML_API_KEY"],
+		custom: true,
+		liveModels: true, // models fetched live from /v1/models at onboarding
+		// The list also carries image / video / audio / embedding models; only
+		// chat-completions entries can drive an agent turn.
+		liveModelsType: "openai/chat-completions",
+		// Cheap, and supports tools + vision + streaming.
+		recommendedModel: "openai/gpt-5-mini",
+		api: "openai-completions",
+		baseUrl: "https://api.aimlapi.com/v1",
+		// Pay-as-you-go per token at each model's published rate.
 		billing: "metered",
 	},
 

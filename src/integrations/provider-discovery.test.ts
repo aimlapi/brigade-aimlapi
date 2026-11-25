@@ -93,6 +93,21 @@ describe("fetchOpenAICompatibleModelIds — live model discovery (NVIDIA NIM etc
 		});
 	});
 
+	it("keeps only entries of the requested type when a type filter is given (AI/ML API)", async () => {
+		mockFetch({
+			data: [
+				{ id: "openai/gpt-5-mini", type: "openai/chat-completions" },
+				{ id: "flux/schnell", type: "image" },
+				{ id: "text-embedding-3-small", type: "embedding" },
+				{ id: "anthropic/claude-sonnet-4.5", type: "openai/chat-completions" },
+			],
+		});
+		const listed = await fetchOpenAICompatibleModelIds("https://api.aimlapi.com/v1", "k", {
+			type: "openai/chat-completions",
+		});
+		assert.deepEqual(listed, { ok: true, ids: ["openai/gpt-5-mini", "anthropic/claude-sonnet-4.5"] });
+	});
+
 	it("reports unavailable on a failed request (bad key / unreachable) — never throws", async () => {
 		mockFetch({ error: "unauthorized" }, false);
 		assert.deepEqual(await fetchOpenAICompatibleModelIds("https://integrate.api.nvidia.com/v1", "bad"), {
