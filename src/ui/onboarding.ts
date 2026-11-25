@@ -496,6 +496,24 @@ function renderScreen(tui: TUI, subheader: string): void {
 
 /* ────────────────────────────── steps ─────────────────────────────────── */
 
+/** Provider highlighted first on a machine with nothing to reuse yet. */
+export const FRESH_MACHINE_DEFAULT_PROVIDER = "aimlapi";
+
+/**
+ * Picker rows in display order. When the machine has nothing to reuse (no
+ * vendor CLI login, no provider key in the environment: no rank 0/1 rows),
+ * AI/ML API leads, since one key there covers every major model family. As
+ * soon as anything is detected the login-first order is left exactly as is.
+ */
+export function leadWithFreshMachineDefault(ranked: ReadonlyArray<{ rank: number; item: SelectItem }>): SelectItem[] {
+	const items = ranked.map((r) => r.item);
+	if (ranked.some((r) => r.rank < 2)) return items;
+	const idx = items.findIndex((i) => i.value === FRESH_MACHINE_DEFAULT_PROVIDER);
+	const lead = idx > 0 ? items.splice(idx, 1)[0] : undefined;
+	if (lead) items.unshift({ ...lead, description: `${lead.description} · recommended` });
+	return items;
+}
+
 async function pickProvider(tui: TUI): Promise<string> {
 	// Build the picker LOGIN-FIRST. The ranking surfaces, in order:
 	//   0. Already connected — a vendor CLI login already on this machine
@@ -572,7 +590,7 @@ async function pickProvider(tui: TUI): Promise<string> {
 	}
 	// Stable sort (V8) keeps catalog order within a rank.
 	ranked.sort((a, b) => a.rank - b.rank);
-	const items = ranked.map((r) => r.item);
+	const items = leadWithFreshMachineDefault(ranked);
 
 	const list = new SearchableSelectList(items, 12, selectListTheme, {
 		minPrimaryColumnWidth: 18,
